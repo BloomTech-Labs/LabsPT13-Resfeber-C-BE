@@ -1,0 +1,232 @@
+This is the endpoint documentation and will be updated as the endpoints are updated.
+
+Endpoints**
+
+/profile or /profiles **12/22/2020 Working?**
+/trips **12/22/2020 Working**
+/pins
+/itinerary
+
+
+****************** /trips ******************
+
+This keeps track of the trips that are created.
+
+A get should return a json that looks like:
+
+id: int  **This is auto-incrementing**
+tripname: **string, required**
+start_date: **string, required**
+end_date: **string**
+overall_covid_score: **string, still working on what this should be**
+total_locations : int
+user_id: ** This should be the current logged in user's id,
+            this will reference the id field in the profiles table
+            to link these records together**
+
+Get
+
+/trips/id
+    will return that trip id
+
+/trips/id/itinerary
+    will return all locations that have the trip ID in params
+
+/trips/id/user
+    THE ID HERE NEEDS TO BE A USER ID.
+    It will return all trips associated with that user id
+Delete
+
+/trips/id
+    will delete that trip id
+
+
+
+Put
+
+/trips/id
+    will update that id
+
+Post
+
+/trips
+    will create a new trip
+
+    body example
+    {
+        tripname:string, **required**
+        start_date:string, **required**
+        end_date:string,
+        overall_covid_score:string,
+        total_locations:integer,
+        user_id:string **needs to be pulled in and included**
+
+    }
+
+
+*************** /pins **********************
+
+Keeps track of the user pins
+
+GETS
+
+/pins
+will return all pins
+
+/pins/id
+
+will return the pins that have that id
+
+/pins/id/user
+
+NOTE: the ID passed into the params here should be the user ID
+
+POSTS
+
+/pins
+will add a pin
+
+{
+    id: automatically increments and is autmogically created
+    destination_name: **string, required**
+    address: **string, required**
+    lat: **float, required**
+    lng: **float, required**
+    city: **string, required**
+    state: **string, required**
+    notes: string
+    category: string
+    user_id: required, and references the id in the profiles table
+}
+
+PUTS
+
+/pins/id
+
+{
+    Only the ID is required for this one, and a field above to be modified
+}
+
+DELETES
+
+/pins/id
+
+
+
+*************** /profiles *******************
+
+This keeps track of the user profiles
+currently uses Okta/Oauth2 for authentication
+
+
+
+Should return
+id:string *!!* This is pulled in from Okata, required *!!*
+email: **string**
+user_name: **string, required, possibly unique**
+avatarUrl: **string**
+status: **string, this is relationship status?**
+address_1: **string, required **
+address_2: **string**
+carType: **string**
+budget: **integer**
+accommodation_type: **string**
+
+
+***************** /itinerary ***************
+
+This keeps track of locations that belong to trips.
+
+GETS
+
+/itinerary
+NOTE This is for troubleshooting and may be disabled in the future
+This returns all trip locations in the db
+
+/itinerary/:id
+
+will return the trip location with that trip location id
+
+Should return 
+
+id: string *This is autoincremented and unique to this location*
+destination_name: string **required**
+address: string **required**
+lat: float **required**
+lng: float **required**
+city: string **required**
+state: string **required**
+category: string
+loc_notes: string !To be expanded upon!
+trip_id: **required** **NOTE: This needs to be a trip_id that exists**
+
+POSTS
+
+/itinerary
+
+id: string *This is autoincremented and unique to this location*
+destination_name: string **required**
+address: string **required**
+lat: float **required**
+lng: float **required**
+city: string **required**
+state: string **required**
+category: string
+loc_notes: string !To be expanded upon!
+trip_id: **required** **NOTE: This needs to be a trip_id that exists**
+
+PATCH
+
+/itinerary/:id
+
+The only requirement is a valid trip_loc id
+
+DELETE
+
+/itinerary/:id
+
+The only requirement is a valid trip_loc id
+
+
+**************** /temp_ds_api ***************
+
+This currently hooks up with the DS API
+
+/temp_ds_api/fuel/{state}
+
+We should only be sending GETS to this API, we are not writing to it
+
+The {state} parameters can be the State name, upper or lowercase, or the abbreviated state
+
+/temp_ds_api/viz/{state}
+
+The {state} parameters can ONLY BE THE ABBREVIATED STATE, Florida = FL, Oklahoma = OK, etc.
+This currently return ALL of the visualtization data, can trim if needed
+
+/temp_ds_api/state_covid/{state}
+
+The state is the Abbreviated state, this will return the number of covid scores in a certain period
+
+/temp_ds_api/air_bnb
+
+You will need to have a body for this request, 
+The body should be as follows:
+{
+    "lat":string,
+    "lon":string,
+    "room_type":string,
+    "num_nights":int
+}
+
+Example:
+
+  {
+  "lat": 40.7128,
+  "lon": 74.006,
+  "room_type": "Entire home/apt",
+  "num_nights": 1
+  }
+
+You should get a float in return
+
+The above should return around 257.32
